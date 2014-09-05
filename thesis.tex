@@ -1,0 +1,89 @@
+\documentclass[11pt,oneside, final]{fithesis2}  
+\usepackage[czech]{babel} % package for multilingual support  
+\usepackage[utf8]{inputenc} % Windows OS encoding  
+\usepackage[T1]{fontenc}  
+\usepackage{lmodern}
+\usepackage{cmap}
+
+\usepackage[plainpages=false,pdfpagelabels,unicode]{hyperref}
+\usepackage[numbers, sort]{natbib}
+\usepackage{graphicx}
+\usepackage{multirow}
+
+%\renewcommand{\baselinestretch}{1.2}	% 1.2 radkovani
+
+ 
+\thesistitle{Engine for drawing isometric game graphics in SVG} % enter thesis title  
+\thesissubtitle{Diploma thesis}  
+\thesisstudent{Bc. Vít Svoboda}    % name of the author  
+\thesiswoman{false}          % defines author?s gender  
+\thesisfaculty{fi}  
+\thesisyear{podzim 2014}  
+\thesisadvisor{Mgr. Marek Grác, Ph.D.} % fill in advisor?s name  
+\thesislang{en}                 % thesis is in English  
+ 
+\begin{document}  
+\FrontMatter  
+\ThesisTitlePage  
+ 
+\begin{ThesisDeclaration}  
+\DeclarationText  
+\AdvisorName  
+\end{ThesisDeclaration}  
+ 
+\begin{ThesisThanks}  
+
+\end{ThesisThanks}  
+ 
+\begin{ThesisAbstract}  
+
+\end{ThesisAbstract}  
+ 
+\begin{ThesisKeyWords}  
+
+\end{ThesisKeyWords}  
+ 
+\MainMatter
+ 
+\tableofcontents          % prints table of contents  
+ 
+\chapter{Úvod}
+\section{Problematika vysoce škálujících serverů}
+
+
+\chapter{Simulátor klienta}
+\section{Vlastnosti serveru}
+
+
+\chapter{Použité technologie}
+
+
+\chapter{Implementace}
+
+
+\section{Obal pro síťový soket}
+
+
+\section{Klient a komunikační protokol}
+
+
+\subsection{Obchod}
+
+
+\section{Rozdělení procesorového času mezi hráče}\label{serializaceHracu}
+
+
+\section{Prohledávání historie}\label{chap:prohledavani_historie}
+
+
+\chapter{Testování a měření}
+
+
+\chapter{Závěr}
+
+
+\bibliographystyle{csplainnat} % sets plain bibliography style  
+\bibliography{sources}     % BibTeX database file  
+
+
+\end{document} 
