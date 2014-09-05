@@ -47,43 +47,50 @@
  
 \tableofcontents          % prints table of contents  
  
-\chapter{Úvod}
-\section{Problematika vysoce škálujících serverů}
+\chapter{Introduction}
+\section{What is a graphic engine}
+\subsection{Typical functionality provided by an engine}
 
+\section{Isometric graphics}
+\subsection{Camera angle description}
+\subsection{Example games, brief history}
 
-\chapter{Simulátor klienta}
-\section{Vlastnosti serveru}
+\section{Web grahpics, HTML5}
+\subsection{Canvas, usage in games}
+\subsection{SVG}
+\subsubsection{Delayed adoption}
+\subsubsection{Different mindset compared to standard graphic engines}
 
+\subsubsection{Can be used for an isometric game instead of a canvas element?}
 
-\chapter{Použité technologie}
+\chapter{Used technologies}
+\section{Client}
+\subsection{JavaScript libraries}
+\subsubsection{SVG manipulation - what are the options, what did I pick and why}
+\subsubsection{General utility - for each what does it do, why do I use it, source, license}
+\begin{itemize}
+	\item require.js
+	\item jQuery
+\end{itemize}
 
+\section{Server for testing purposes}
+\subsection{RESTEasy (jBoss REST library}
+\subsection{Jackson (JSON serialization}
+\subsection{AppEngine API (Google App Engine hosting}
 
-\chapter{Implementace}
+\chapter{Implementation}
+\subsection{Features I implemented}
+\subsection{Features I did not implement with reasoning why not}
 
+\section{Testing and measurement}
+\subsection{Performance on desktop and mobile devices}
 
-\section{Obal pro síťový soket}
-
-
-\section{Klient a komunikační protokol}
-
-
-\subsection{Obchod}
-
-
-\section{Rozdělení procesorového času mezi hráče}\label{serializaceHracu}
-
-
-\section{Prohledávání historie}\label{chap:prohledavani_historie}
-
-
-\chapter{Testování a měření}
-
-
-\chapter{Závěr}
-
+\chapter{Conclusion}
 
 \bibliographystyle{csplainnat} % sets plain bibliography style  
 \bibliography{sources}     % BibTeX database file  
 
+\appendix
+\chapter{How to use my engine for your game}
 
 \end{document} 
