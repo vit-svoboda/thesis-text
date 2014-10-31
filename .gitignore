@@ -1,0 +1,17 @@
+# LaTex output files
+
+*.aux
+*.log
+*.out
+*.pdf
+*.synctex.gz
+*.toc
+
+# LaTex template files
+
+loga
+*.bst
+*.cls
+*.clo
+*.514pk
+*.mf
