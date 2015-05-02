@@ -15,3 +15,8 @@ loga
 *.clo
 *.514pk
 *.mf
+
+# BibTex output files
+
+*.blg
+*.bbl
