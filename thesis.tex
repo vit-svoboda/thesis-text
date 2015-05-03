@@ -97,10 +97,10 @@ The first game using isometric graphics was Zaxxon released by SEGA in 1982\cite
 Web applications on the client side can rely only on the browser application and its capabilities. No middleware directly accessing hardware is guaranteed. Therefore the browser games\footnote{Games played on a web page displayed in the browser.} draw graphics to some element in the HTML page. Prior to the version 5 of the HTML standard, the games almost exclusively used Flash and required the client browser to have Adobe Flash Player plug-in installed\cite{flashplayer}. With the broad adoption of HTML5, new options presented themselves. Two new elements to display graphics allow to stop making any assumptions about the client other than whether it supports HTML5.
 
 \subsection{Canvas, usage in games}
-The canvas element is very similar to the canvas objects in other programming environments\footnote{E.g. classes \texttt{System.Windows.Controls.Canvas} in .NET framework\cite{net_canvas} or \texttt{java.awt.Canvas} in the Java platform\cite{java_canvas}}. It allows to directly draw to the canvas bitmap using JavaScript functions. Even though this approach is straight forward, some disadvantages arise when applied. Most noticeable is that when an object is being changed, everything that even partially covers it has to be re-drawn as well even if it stays unchanged. Also when drawing several objects that appear behind and in front of each other, these need to be carefully drawn in a correct order so the overlaps are correct and the illusion of space remains unbroken.
+The \texttt{canvas} element is very similar to the canvas objects in other programming environments\footnote{E.g. classes \texttt{System.Windows.Controls.Canvas} in .NET framework\cite{net_canvas} or \texttt{java.awt.Canvas} in the Java platform\cite{java_canvas}}. It allows to directly draw to the canvas bitmap using JavaScript functions. Even though this approach is straight forward, some disadvantages arise when applied. Most noticeable is that when an object is being changed, everything that even partially covers it has to be re-drawn as well even if it stays unchanged. Also when drawing several objects that appear behind and in front of each other, these need to be carefully drawn in a correct order so the overlaps are correct and the illusion of space remains unbroken.
 
 \subsection{SVG}
-SVG element is very different as it displays given SVG\footnote{Scalable Vector Graphics}, a vector image described in a markup language of the same name. It can also be dynamically manipulated with JavaScript, but the approach is fundamentally different. Elements are added to the DOM\footnote{Document Object Model} as if only standard HTML was used. Instead of redrawing the whole image or a part of screen, individual objects can be added, removed or changed. This makes for example an animation of an object much more straight forward. User interaction handling is also easier since event handlers can be hooked onto the elements representing the objects.
+The \texttt{svg} element is very different as it displays given SVG\footnote{Scalable Vector Graphics}, a vector image described in a markup language of the same name. It can also be dynamically manipulated with JavaScript, but the approach is fundamentally different. Elements are added to the DOM\footnote{Document Object Model} as if only standard HTML was used. Instead of redrawing the whole image or a part of screen, individual objects can be added, removed or changed. This makes for example an animation of an object much more straight forward. User interaction handling is also easier since event handlers can be hooked onto the elements representing the objects.
 
 Even though browsers used to support static SVG for a long time, not until HTML5 did they support dynamic in-line SVG\cite{w3_html5}. This is now available with the previously mentioned element. Since rendering the markup language is much more complicated than simple dumping the canvas bitmap on the screen, the browser support is delayed and also more sensitive to performance problems. Drawing to the canvas may take a lot of JavaScript execution time, but in the end the display of the element takes amount time only effected by the size of the canvas, not complexity of its content. Creating large SVG will take similar time, but then rendering it on the screen will take browser another time.
 
@@ -110,15 +110,15 @@ Can SVG be used to draw isometric game graphics instead of the standard canvas a
 
 \chapter{Used technologies}
 \label{tech}
+
 \section{Client}
-The rendering engine is client-based and hence all technologies used in it are based around JavaScript.
+The graphics engine is being run on the client and hence all technologies used in it are based around JavaScript.
 
 \subsection{Browser support of used system JavaScript objects}
 JSON, XmlHttpRequest
 
-Internet Explorer does not support \texttt{foreignObject} SVG element\cite{ieforeignobject}
-
 \subsection{Browser support of HTML5 SVG element}
+HTML5's \texttt{svg} element as such is well supported by modern browsers\cite{}, but there are some difficulties with the implementation details in different browsers. Internet Explorer does not support \texttt{foreignObject} SVG element\cite{ieforeignobject}
 
 \subsection{SVG manipulation JavaScript libraries}
 There are several JavaScript libraries that provide abstract layer over SVG markup to.
@@ -131,12 +131,9 @@ For each what does it do, why do I use it, source, license
 	\item jQuery
 \end{itemize}
 
-\section{Server for testing purposes}
+\section{Other technologies used in the demo game}
 \subsection{RESTEasy}
-jBoss REST library
-
-\subsection{Jackson}
-JSON serialization
+RESTEasy is a JBoss project allowing to create a web service with parametrized URLs mapped to methods\cite{resteasy}. This service can very easily  provide RESTful\footnote{RESTful service meets all requirements defined by Representational State Transfer architecture, that is mainly unified access to creation, reading, update and deletion of provided resource\cite{fielding}.} management API, hence the project name. Jackson JAX-RS providers\cite{jackson} are used instead of the default JSON serializer to allow the service return custom Java objects with no additional annotations serialized to JSON.
 
 \subsection{AppEngine API}
 Google App Engine hosting
@@ -152,20 +149,21 @@ Important part of the engine implementation is reusability and therefore abstrac
 	\label{classdiagram}
 \end{figure}
 
-\subsection{Viewport population and data fetching}
+\section{Viewport population and data fetching}
 To populate the screen with tiles, data describing each of the tiles that will be displayed on the screen need to be obtained. That is performed via an asynchronous call to the client object that will in return call asynchronous callback on the engine after it obtains or creates the requested data. These data can be continuous array of tile content values or if the client determines that only a few tiles changed, only content and coordinates of these changed tiles can be returned. This will save data traffic when repeatedly requesting updates of the same area.
 
-\subsection{Sprites}
+\section{Sprites}
 The standard (citation needed) of making 2D games is to draw small images of objects and then compose the scene using these images. This way the object can be animated easily by replacing said image with next animation frame image. For performance reasons all these sprites are compiled to a single image called sprite-sheet. The graphic engine needs to be able to draw a sub-selection of the image. When working with HTML5 canvas element, JavaScript function \texttt{context.drawImage(img, sx, sy, swidth, sheight, x, y, width, height)} does exactly that. First set of of coordinates and dimensions determines which part of the source image will be drawn. When using SVG, no such a straightforward and convenient way is available. To display a section of an image, one needs to create a pattern from it and position it using a negative coordinates. The pattern must use objectBoundingBox units so it doesn't shrink the whole sprite-sheet in the target element. Then an SVG element (usually polygon) using this pattern can display desired selection of an image.
 The limitation of this approach is that all elements using the same pattern must have synchronous animation, what usually doesn't look too organic in the result. On the other hand it nicely emulates the early 90s era of gaming.
 
-\subsection{Object stacking and verticality}
+\section{Object stacking and verticality}
 
-\subsection{Features I did not implement with reasoning why not}
+\section{Features I did not implement with reasoning why not}
 
 \chapter{Testing and measurement}
 \label{testing}
-\subsection{Performance on desktop and mobile devices}
+
+\section{Performance on desktop and mobile devices}
 Mobile devices were probably a long shot, even desktop browsers have vast differences in performance - in chrome everything runs nicely, Firefox is barely usable and Internet Explorer 11 is absolutely useless.
 
 \chapter{Conclusion}
