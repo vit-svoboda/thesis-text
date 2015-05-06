@@ -106,7 +106,7 @@ Even though browsers used to support static SVG for a long time, not until HTML5
 
 \chapter{Suggested solution}
 \label{solution}
-Can SVG be used to draw isometric game graphics instead of the standard canvas approach? If so, the SVG would make manipulation with specific objects in a drawn scene much easier.
+Can inline SVG be used to draw isometric game graphics instead of the standard canvas approach? W3Schools in a chapter about HTML5 \texttt{svg} element warn that unlike the \texttt{canvas} element is not suitable for game applications\cite{html5svg}. Why is that though? With the event handling support it should be even more suitable and manipulation with specific objects in a drawn scene should much easier.
 
 \chapter{Used technologies}
 \label{tech}
@@ -114,11 +114,8 @@ Can SVG be used to draw isometric game graphics instead of the standard canvas a
 \section{Client}
 The graphics engine is being run on the client and hence all technologies used in it are based around JavaScript.
 
-\subsection{Browser support of used system JavaScript objects}
-JSON, XmlHttpRequest
-
 \subsection{Browser support of HTML5 SVG element}
-HTML5's \texttt{svg} element as such is well supported by modern browsers\cite{}, but there are some difficulties with the implementation details in different browsers. Internet Explorer does not support \texttt{foreignObject} SVG element\cite{ieforeignobject}
+HTML5's \texttt{svg} element as such is well supported by modern browsers\cite{html5svg}, but there are some difficulties with the implementation details in different browsers. Internet Explorer does not support \texttt{foreignObject} SVG element\cite{ieforeignobject}
 
 \subsection{SVG manipulation JavaScript libraries}
 There are several JavaScript libraries that provide abstract layer over SVG markup to.
@@ -132,8 +129,16 @@ For each what does it do, why do I use it, source, license
 \end{itemize}
 
 \section{Other technologies used in the demo game}
+
+\subsection{JavaScript objects provided by browsers}
+Since the engine itself is abstracted from actual data source and format, the browser support for network communication and serialization is not needed until the specific game implementation.
+
+For obtaining data from the server uses the demo application \texttt{XmlHttpRequest}, a JavaScript object widely supported by browsers\cite{xhr}. It allows to create an asynchronous HTTP request with a callback when the response is obtained.
+
+To parse the JSON\footnote{JavaScript Object Notation data format} responses to a JavaScript object is used the \texttt{JSON} JavaScript object specified by ECMAScript 5.1 and also supported by modern browsers\cite{json}.
+
 \subsection{RESTEasy}
-RESTEasy is a JBoss project allowing to create a web service with parametrized URLs mapped to methods\cite{resteasy}. This service can very easily  provide RESTful\footnote{RESTful service meets all requirements defined by Representational State Transfer architecture, that is mainly unified access to creation, reading, update and deletion of provided resource\cite{fielding}.} management API, hence the project name. Jackson JAX-RS providers\cite{jackson} are used instead of the default JSON serializer to allow the service return custom Java objects with no additional annotations serialized to JSON.
+RESTEasy is a JBoss project allowing to create a web service with parametrized URLs mapped to methods\cite{resteasy}. This service can very easily  provide RESTful\footnote{RESTful service meets all requirements defined by Representational State Transfer architecture, that is mainly unified access to creation, reading, update and deletion of provided resource\cite{fielding}.} management API, hence the project name. Jackson JAX-RS providers\cite{jackson} are used instead of the default JSON serializer to allow the service return custom Java objects with no additional annotations serialized to JSON. This framework was selected due to the simplicity of creating a service that provides access to the pseudo randomly generated model of the demo application.
 
 \subsection{AppEngine API}
 Google App Engine hosting
