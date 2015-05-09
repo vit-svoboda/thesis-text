@@ -55,13 +55,13 @@ Browser games used to be built using third party solutions\cite{pagella}. Specif
 \chapter{State of the art}
 \label{theory}
 
-Modern video games are designed to be data driven. That way as much code as possible can be used again in similar games. The common functionality can be packed in a software component called game engine\cite{gregory} and distributed separately from the game itself for other developers. A game engine is responsible for collision detection, physics calculation, game logic script execution and, for the focus of this work most importantly, rendering. Part of a game engine that encapsulates the last mentioned responsibility is called graphics or rendering engine.
+Modern video games are designed to be data driven\footnote{Data-driven program determines execution flow based on provided data. The data describe program behavior. Therefore an unchanged code can perform different tasks when given appropriate data.\cite{charniak}}. That way as much code as possible can be used again in similar games. The common functionality can be packed in a software component called game engine\cite{gregory} and distributed separately from the game itself for other developers. A game engine is responsible for collision detection, physics calculation, game logic script execution and, for the focus of this work most importantly, rendering. Part of a game engine that encapsulates the last mentioned responsibility is called graphics or rendering engine.
 
 \section{Graphics engine}
 Graphics engine is a software component responsible for transformation of a logical model of a scene to an image on the screen. Graphic engines used in native applications heavily depend on middleware like OpenGL or DirectX\cite{gregory}.
 
 \subsection{Typical functionality}
-The input for a graphic engine is a set of objects on the scene, data representing their appearance\footnote{Sprites, meshes and textures} and a camera position. The engine has to determine what objects or their parts are currently visible from the point of view of the given camera. A properly placed visual representation needs to be created for these objects. The output is a bitmap stored in memory containing graphic representation of all related objects. It can be prepared directly or more usually, rather than manipulating the bitmap directly, done via a series of calls to some underlying API. Optionally the engine can perform various post-processing on the output, such as anti-aliasing, shading etc.\cite{gregory} More complex post-processing is usually performed only in 3D applications. When rendering a real-time image, the process has to be repeated several times per second to maintain perception of a fluid animation. Simply put, the higher frame rate\footnote{Frame rate is often referred to as FPS (Frames Per Second) with value equivalent to frequency in Hz.}, the better\cite{claypool}. Nowadays the frame rate is limited by standard display hardware with 60Hz refresh rate, but new hardware allowing to display image at 120, 144 Hz or ever more is emerging on the market.
+The input for a graphic engine is a set of objects on the scene, data representing their appearance\footnote{Sprites, meshes and textures} and a camera position. The engine has to determine what objects or their parts are currently visible from the point of view of the given camera. A properly placed visual representation needs to be created for these objects. The output is a bitmap stored in memory containing graphic representation of all related objects. It can be prepared directly or more usually, rather than manipulating the bitmap directly, done via a series of calls to some underlying API\footnote{Application Programming Interface}. Optionally the engine can perform various post-processing on the output, such as anti-aliasing, shading etc.\cite{gregory} More complex post-processing is usually performed only in 3D applications. When rendering a real-time image, the process has to be repeated several times per second to maintain perception of a fluid animation. Simply put, the higher frame rate\footnote{Frame rate is often referred to as FPS (Frames Per Second) with value equivalent to frequency in Hz.}, the better\cite{claypool}. Nowadays the frame rate is limited by standard display hardware with 60Hz refresh rate, but new hardware allowing to display image at 120, 144 Hz or ever more is emerging on the market.
 
 \section{Isometric graphics}
 Isometric projection is an axonometric projection\footnote{Projection of an object rotated along one or more axes relative to the plane of projection\cite{maynard}.} with perpendicular direction of the projection and equal angle between the view plane and all axes\cite{desai} as shown in Figure \ref{isometric}. This way all 3 dimensions can be displayed sufficiently enough to allow orientation while keeping the rendering simple and therefore fast. 
@@ -84,7 +84,7 @@ The camera is top down, but tilted by 45 degrees in both directions. The diagona
 \end{figure}
 
 \subsection{Example games, brief history}
-The first game using isometric graphics was Zaxxon released by SEGA in 1982\cite{zaxxon} (see Figure \ref{zaxxon}). This new approach allowed to display 3D scene without the need for hardware accelerated 3D rendering. The same graphic style was later used in many other games, especially genres where the player overviews the scene from the top. In the 1990s, isometric graphics were common in games like Command\&Conquer or Transport Tycoon. These strategies often divided the map to regular tiles that limited the player actions but made collision detection and other game mechanics very simple. This design outlived the slow hardware with no graphic acceleration and is still popular both among independent developers with limited resources and in environments where hardware acceleration is not granted\footnote{Typically browser games discussed later.}.
+The first game using isometric graphics was Zaxxon released by SEGA in 1982\cite{zaxxon} (see Figure \ref{zaxxon}). This new approach allowed to display 3D scene without the need for hardware accelerated 3D rendering. Pre-isometric games were less graphically appealing. Example Warcraft. The same graphic style was later used in many other games, especially genres where the player overviews the scene from the top. In the 1990s, isometric graphics were common in games like Command\&Conquer\cite{}, Age of Empires or Transport Tycoon\cite{}. These strategies often divided the map to regular tiles that limited the player actions but made collision detection and other game mechanics very simple. This design outlived the slow hardware with no graphic acceleration and is still popular both among independent developers with limited resources and in environments where hardware acceleration is not granted\footnote{Typically browser games discussed later.}. Post-isometric games - 3D with locked camera (similar to isometric but has perspective) and free camera strategies. Later limits of camera movement due to player confusion. Give example Starcraft 2.
 
 \begin{figure}[htp]
 	\centering
@@ -104,9 +104,13 @@ The \texttt{svg} element is very different as it displays given SVG\footnote{Sca
 
 Even though browsers used to support static SVG for a long time, not until HTML5 did they support dynamic in-line SVG\cite{w3_html5}. This is now available with the previously mentioned element. Since rendering the markup language is much more complicated than simple dumping the canvas bitmap on the screen, the browser support is delayed and also more sensitive to performance problems. Drawing to the canvas may take a lot of JavaScript execution time, but in the end the display of the element takes amount time only effected by the size of the canvas, not complexity of its content. Creating large SVG will take similar time, but then rendering it on the screen will take browser another time.
 
-\chapter{Suggested solution}
+\chapter{Suggested solution / design}
 \label{solution}
 Can inline SVG be used to draw isometric game graphics instead of the standard canvas approach? W3Schools in a chapter about HTML5 \texttt{svg} element warn that unlike the \texttt{canvas} element is not suitable for game applications\cite{html5svg}. Why is that though? With the event handling support it should be even more suitable and manipulation with specific objects in a drawn scene should much easier.
+
+\section{Sprites}
+The standard (citation needed) of making 2D games is to draw small images of objects and then compose the scene using these images. This way the object can be animated easily by replacing said image with next animation frame image. For performance reasons all these sprites are compiled to a single image called sprite-sheet. The graphic engine needs to be able to draw a sub-selection of the image. When working with HTML5 canvas element, JavaScript function \texttt{context.drawImage(img, sx, sy, swidth, sheight, x, y, width, height)} does exactly that. First set of of coordinates and dimensions determines which part of the source image will be drawn. When using SVG, no such a straightforward and convenient way is available. To display a section of an image, one needs to create a pattern from it and position it using a negative coordinates. The pattern must use objectBoundingBox units so it doesn't shrink the whole sprite-sheet in the target element. Then an SVG element (usually polygon) using this pattern can display desired selection of an image.
+The limitation of this approach is that all elements using the same pattern must have synchronous animation, what usually doesn't look too organic in the result. On the other hand it nicely emulates the early 90s era of gaming.
 
 \chapter{Used technologies}
 \label{tech}
@@ -118,15 +122,26 @@ The graphics engine is being run on the client and hence all technologies used i
 HTML5's \texttt{svg} element as such is well supported by modern browsers\cite{html5svg}, but there are some difficulties with the implementation details in different browsers. Internet Explorer does not support \texttt{foreignObject} SVG element\cite{ieforeignobject}
 
 \subsection{SVG manipulation JavaScript libraries}
-There are several JavaScript libraries that provide abstract layer over SVG markup to.
-What are the options, what did I pick and why
+The contents of the \texttt{svg} element can be manipulated directly via JavaScript, but like regular HTML DOM manipulation it is laborious and ends up with lots of repetitive code. To eliminate this drawback there are several JavaScript libraries that provide abstract layer over the SVG markup. Most of them are open source.
+
+A pioneer among these libraries is \emph{Raphaël}. The projects puts emphasis on wide browser support including archaic Internet Explorer version 6.0 \cite{}.
+
+\emph{Raphaël}'s rewrite, \emph{Snap.svg} is not held back by compatibility to obsolete browsers and so it can support features like masking, clipping, patterns, full gradients, groups\cite{}. Snap.svg is quite popular among front-end developers who typically create animation on based on static SVG for web sites\cite{}. When working with SVG elements and their attributes are represented as string values. This may be perfect for mentioned application, but when creating all of the content dynamically, this involves a lot of string concatenation in the end, which is far from ideal in intended use.
+
+Next library called simply \emph{svg.js} takes more object oriented approach\cite{} that is more suitable for this project. The project is modularized so for a production environment can be built with only the functionality that is really used to decrease script size. There are also quite a few additional modules providing extra functionality that might prove useful.
+
+Another popular project called \emph{D3.js} does not limit its scope to SVG and approaches the DOM manipulation in a similar manner to \emph{jQuery}. Emphasis on querying the DOM, that is very performance demanding once the DOM has a large amount of elements, makes this project not suitable as well.
+
+There are of course other libraries, but since the game developer using the engine will have to work with given SVG manipulation library to some extent, commonly used library with good documentation may make his use of the engine much easier. All considered, the \emph{svg.js} project was selected to serve as a SVG markup markup manipulation API.
 
 \subsection{General utility JavaScript libraries}
-For each what does it do, why do I use it, source, license
-\begin{itemize}
-	\item require.js
-	\item jQuery
-\end{itemize}
+Other general purpose JavaScript libraries are used to keep the actual engine code clean and readable. Like previously discussed libraries, these are open source as well and use non-restrictive licenses.
+
+To help manage the JavaScript application structure is used library \emph{require.js} that allows to define modules and dependencies between them. Then it makes sure all files containing required modules are loaded prior to their usage. \cite{requirejs} This approach eliminates many of flaws of JavaScript as a language, particularly declaration scope confusion and possible redeclaration of variables and dependency on functions or variables that may not be declared yet.
+
+Some very limited HTML manipulation is simplified using \emph{jQuery} library. Since the engine does not work with HTML out of the \texttt{svg} element the usage is rather minimal, mostly to access element properties in a unified fashion\footnote{Even something as simple as getting element's actual width can be quite laborious to get working across browsers without \emph{jQuery}.}. Since the display of game scene can generate quite a lot of elements, querying them, the main point of \emph{jQuery}, has to be done with performance in mind.
+
+Automatic tests of the engine API are written using the \emph{Jasmine} framework. It allows to define test cases and expected behaviour. Out of the box can these tests be run in the browser like the engine itself. Using the \emph{Karma} test runner the tests also can be integrated to the \emph{maven} build process.
 
 \section{Other technologies used in the demo game}
 
@@ -141,7 +156,7 @@ To parse the JSON\footnote{JavaScript Object Notation data format} responses to 
 RESTEasy is a JBoss project allowing to create a web service with parametrized URLs mapped to methods\cite{resteasy}. This service can very easily  provide RESTful\footnote{RESTful service meets all requirements defined by Representational State Transfer architecture, that is mainly unified access to creation, reading, update and deletion of provided resource\cite{fielding}.} management API, hence the project name. Jackson JAX-RS providers\cite{jackson} are used instead of the default JSON serializer to allow the service return custom Java objects with no additional annotations serialized to JSON. This framework was selected due to the simplicity of creating a service that provides access to the pseudo randomly generated model of the demo application.
 
 \subsection{AppEngine API}
-Google App Engine hosting
+Google App Engine is a hosting service provided by Google. The engine demo application was hosted on this service for demonstration purposes and so the project had to contain piece of appropriate configuration. With generously limited bandwidth is the service free of charge. \cite{}
 
 \chapter{Implementation}
 \label{implementation}
@@ -156,10 +171,6 @@ Important part of the engine implementation is reusability and therefore abstrac
 
 \section{Viewport population and data fetching}
 To populate the screen with tiles, data describing each of the tiles that will be displayed on the screen need to be obtained. That is performed via an asynchronous call to the client object that will in return call asynchronous callback on the engine after it obtains or creates the requested data. These data can be continuous array of tile content values or if the client determines that only a few tiles changed, only content and coordinates of these changed tiles can be returned. This will save data traffic when repeatedly requesting updates of the same area.
-
-\section{Sprites}
-The standard (citation needed) of making 2D games is to draw small images of objects and then compose the scene using these images. This way the object can be animated easily by replacing said image with next animation frame image. For performance reasons all these sprites are compiled to a single image called sprite-sheet. The graphic engine needs to be able to draw a sub-selection of the image. When working with HTML5 canvas element, JavaScript function \texttt{context.drawImage(img, sx, sy, swidth, sheight, x, y, width, height)} does exactly that. First set of of coordinates and dimensions determines which part of the source image will be drawn. When using SVG, no such a straightforward and convenient way is available. To display a section of an image, one needs to create a pattern from it and position it using a negative coordinates. The pattern must use objectBoundingBox units so it doesn't shrink the whole sprite-sheet in the target element. Then an SVG element (usually polygon) using this pattern can display desired selection of an image.
-The limitation of this approach is that all elements using the same pattern must have synchronous animation, what usually doesn't look too organic in the result. On the other hand it nicely emulates the early 90s era of gaming.
 
 \section{Object stacking and verticality}
 
