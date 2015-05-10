@@ -96,6 +96,9 @@ The first game using isometric graphics was Zaxxon released by SEGA in 1982\cite
 \section{Web graphics and HTML5}
 Web applications on the client side can rely only on the browser application and its capabilities. No middleware directly accessing hardware is guaranteed. Therefore the browser games\footnote{Games played on a web page displayed in the browser.} draw graphics to some element in the HTML page. Prior to the version 5 of the HTML standard, the games almost exclusively used Flash and required the client browser to have Adobe Flash Player plug-in installed\cite{flashplayer}. With the broad adoption of HTML5, new options presented themselves. Two new elements to display graphics allow to stop making any assumptions about the client other than whether it supports HTML5.
 
+http://canvace.com, http://canvasengine.net/, http://enchantjs.com/ nebo placeny http://www.isogenicengine.com/
+
+
 \subsection{Canvas, usage in games}
 The \texttt{canvas} element is very similar to the canvas objects in other programming environments\footnote{E.g. classes \texttt{System.Windows.Controls.Canvas} in .NET framework\cite{net_canvas} or \texttt{java.awt.Canvas} in the Java platform\cite{java_canvas}}. It allows to directly draw to the canvas bitmap using JavaScript functions. Even though this approach is straight forward, some disadvantages arise when applied. Most noticeable is that when an object is being changed, everything that even partially covers it has to be re-drawn as well even if it stays unchanged. Also when drawing several objects that appear behind and in front of each other, these need to be carefully drawn in a correct order so the overlaps are correct and the illusion of space remains unbroken.
 
@@ -119,18 +122,18 @@ The limitation of this approach is that all elements using the same pattern must
 The graphics engine is being run on the client and hence all technologies used in it are based around JavaScript.
 
 \subsection{Browser support of HTML5 SVG element}
-HTML5's \texttt{svg} element as such is well supported by modern browsers\cite{html5svg}, but there are some difficulties with the implementation details in different browsers. Internet Explorer does not support \texttt{foreignObject} SVG element\cite{ieforeignobject}
+HTML5's \texttt{svg} element as such is well supported by modern browsers\cite{html5svg}, but there are some difficulties with the implementation details in different browsers. A striking example be Internet Explorer that entirely lacks support of \texttt{foreignObject} SVG element that normally allows to nest HTML in the SVG image\cite{ieforeignobject}.
 
 \subsection{SVG manipulation JavaScript libraries}
 The contents of the \texttt{svg} element can be manipulated directly via JavaScript, but like regular HTML DOM manipulation it is laborious and ends up with lots of repetitive code. To eliminate this drawback there are several JavaScript libraries that provide abstract layer over the SVG markup. Most of them are open source.
 
-A pioneer among these libraries is \emph{Raphaël}. The projects puts emphasis on wide browser support including archaic Internet Explorer version 6.0 \cite{}.
+A pioneer among these libraries is \emph{Raphaël}. The projects puts emphasis on wide browser support including archaic Internet Explorer version 6.0 \cite{raphael}.
 
-\emph{Raphaël}'s rewrite, \emph{Snap.svg} is not held back by compatibility to obsolete browsers and so it can support features like masking, clipping, patterns, full gradients, groups\cite{}. Snap.svg is quite popular among front-end developers who typically create animation on based on static SVG for web sites\cite{}. When working with SVG elements and their attributes are represented as string values. This may be perfect for mentioned application, but when creating all of the content dynamically, this involves a lot of string concatenation in the end, which is far from ideal in intended use.
+\emph{Raphaël}'s rewrite, \emph{Snap.svg} is not held back by compatibility to obsolete browsers and so it can support features like masking, clipping, patterns, full gradients, groups\cite{snap}. Snap.svg is quite popular among front-end developers who typically create animation based on static SVG for web sites\cite{snapusage}. When working with SVG elements and their attributes are represented as string values. This may be perfect for mentioned application, but when creating all of the content dynamically, this involves a lot of string concatenation in the end, which is far from ideal in intended use.
 
-Next library called simply \emph{svg.js} takes more object oriented approach\cite{} that is more suitable for this project. The project is modularized so for a production environment can be built with only the functionality that is really used to decrease script size. There are also quite a few additional modules providing extra functionality that might prove useful.
+Next library called simply \emph{svg.js} takes more object oriented approach\cite{svgjs} that is more suitable for this project. The project is modularized so for a production environment can be built with only the functionality that is really used to decrease script size. There are also quite a few additional modules providing extra functionality that might prove useful.
 
-Another popular project called \emph{D3.js} does not limit its scope to SVG and approaches the DOM manipulation in a similar manner to \emph{jQuery}. Emphasis on querying the DOM, that is very performance demanding once the DOM has a large amount of elements, makes this project not suitable as well.
+Another popular project called \emph{D3.js} does not limit its scope to SVG and approaches the DOM manipulation in a similar manner to \emph{jQuery}\cite{d3js}. Emphasis on querying the DOM, that is very performance demanding once the DOM has a large amount of elements, makes this project not suitable as well.
 
 There are of course other libraries, but since the game developer using the engine will have to work with given SVG manipulation library to some extent, commonly used library with good documentation may make his use of the engine much easier. All considered, the \emph{svg.js} project was selected to serve as a SVG markup markup manipulation API.
 
@@ -139,9 +142,9 @@ Other general purpose JavaScript libraries are used to keep the actual engine co
 
 To help manage the JavaScript application structure is used library \emph{require.js} that allows to define modules and dependencies between them. Then it makes sure all files containing required modules are loaded prior to their usage. \cite{requirejs} This approach eliminates many of flaws of JavaScript as a language, particularly declaration scope confusion and possible redeclaration of variables and dependency on functions or variables that may not be declared yet.
 
-Some very limited HTML manipulation is simplified using \emph{jQuery} library. Since the engine does not work with HTML out of the \texttt{svg} element the usage is rather minimal, mostly to access element properties in a unified fashion\footnote{Even something as simple as getting element's actual width can be quite laborious to get working across browsers without \emph{jQuery}.}. Since the display of game scene can generate quite a lot of elements, querying them, the main point of \emph{jQuery}, has to be done with performance in mind.
+Some very limited HTML manipulation is simplified using \emph{jQuery} library. Since the engine does not work with HTML out of the \texttt{svg} element the usage is rather minimal, mostly to access element properties in a unified fashion\footnote{Even something as simple as getting element's actual width can be quite laborious to get working across browsers without \emph{jQuery}.}. Since the display of game scene can generate quite a lot of elements, querying them, the main point of \emph{jQuery}\cite{jquery}, has to be done with performance in mind.
 
-Automatic tests of the engine API are written using the \emph{Jasmine} framework. It allows to define test cases and expected behaviour. Out of the box can these tests be run in the browser like the engine itself. Using the \emph{Karma} test runner the tests also can be integrated to the \emph{maven} build process.
+Automatic tests of the engine API are written using the \emph{Jasmine} framework. It allows to define test cases and expected behaviour\cite{jasmine}. Out of the box can these tests be run in the browser like the engine itself. Using the \emph{Karma} test runner the tests also can be integrated to the \emph{maven}\footnote{Maven is a build automation tool\cite{maven} used in this project mostly due to the demo back-end written in Java.} build process\cite{karma}.
 
 \section{Other technologies used in the demo game}
 
@@ -156,7 +159,7 @@ To parse the JSON\footnote{JavaScript Object Notation data format} responses to 
 RESTEasy is a JBoss project allowing to create a web service with parametrized URLs mapped to methods\cite{resteasy}. This service can very easily  provide RESTful\footnote{RESTful service meets all requirements defined by Representational State Transfer architecture, that is mainly unified access to creation, reading, update and deletion of provided resource\cite{fielding}.} management API, hence the project name. Jackson JAX-RS providers\cite{jackson} are used instead of the default JSON serializer to allow the service return custom Java objects with no additional annotations serialized to JSON. This framework was selected due to the simplicity of creating a service that provides access to the pseudo randomly generated model of the demo application.
 
 \subsection{AppEngine API}
-Google App Engine is a hosting service provided by Google. The engine demo application was hosted on this service for demonstration purposes and so the project had to contain piece of appropriate configuration. With generously limited bandwidth is the service free of charge. \cite{}
+Google App Engine is a cloud hosting service provided by Google. The engine demo application was hosted on this service for demonstration purposes and so the project had to contain piece of appropriate configuration. With generously limited bandwidth is the service free of charge. \cite{appengine}
 
 \chapter{Implementation}
 \label{implementation}
