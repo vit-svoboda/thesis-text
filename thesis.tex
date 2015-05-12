@@ -187,6 +187,13 @@ Important part of the engine implementation is reusability and therefore abstrac
 \section{Viewport population and data fetching}
 To populate the screen with tiles, data describing each of the tiles that will be displayed on the screen need to be obtained. That is performed via an asynchronous call to the client object that will in return call asynchronous callback on the engine after it obtains or creates the requested data. These data can be continuous array of tile content values or if the client determines that only a few tiles changed, only content and coordinates of these changed tiles can be returned. This will save data traffic when repeatedly requesting updates of the same area.
 
+\begin{figure}[htp]
+	\centering
+	\includegraphics[clip=true,trim=20mm 17mm 20mm 23mm]{thesis-isodata}
+	\caption{Data needed to fill a rectangle viewport}
+	\label{isodata}
+\end{figure}
+
 \section{Object stacking and verticality}
 
 \section{Features I did not implement with reasoning why not}
