@@ -67,9 +67,9 @@ The input for a graphic engine is a set of objects on the scene, data representi
 \section{Isometric graphics}
 Isometric projection is an axonometric projection\footnote{Projection of an object rotated along one or more axes relative to the plane of projection\cite{maynard}.} with perpendicular direction of the projection and equal angle between the view plane and all axes\cite{desai} as shown in Figure \ref{isometric}. This way all 3 dimensions can be displayed sufficiently enough to allow orientation while keeping the rendering simple and therefore fast. 
 
-\begin{figure}[htp]
+\begin{figure}[h]
 	\centering
-	\includegraphics[clip=true,trim=0 205mm 100mm 0]{thesis-isobox}
+	\includegraphics[clip=true,trim=0 205mm 100mm 20mm]{thesis-isobox}
 	\caption{Isometric projection}
 	\label{isometric}
 \end{figure}
@@ -77,7 +77,7 @@ Isometric projection is an axonometric projection\footnote{Projection of an obje
 \subsection{Isometric camera}
 The camera is top down, but tilted by 45 degrees in both directions. The diagonals therefore should be at 30 degrees, but due to the irregular aliasing of these diagonals on the bitmap grid the practical approach is slightly different. Figure \ref{isoangle} shows the problematic bitmap grid as well as the solution. The image is rotated by 45 degrees and then the aspect ratio is changed to 2:1. The result are regular 2pixel stairs forming diagonals in about 26.565 degrees\footnote{\begin{math}\arctan \frac{1}{2} \approx 26.565\si{\degree}\end{math}}. The side effect of this change is complete elimination of trigonometry from the projection mathematics further improving the rendering performance.
 
-\begin{figure}[htp]
+\begin{figure}[h]
 	\centering
 	\includegraphics[width=0.7\textwidth]{thesis-angles}
 	\caption{Isometric projection angle}
@@ -87,7 +87,7 @@ The camera is top down, but tilted by 45 degrees in both directions. The diagona
 \subsection{Example games, brief history}
 The first game using isometric graphics was Zaxxon released by SEGA in 1982\cite{zaxxon} (see Figure \ref{zaxxon}). This new approach allowed to display 3D scene without the need for hardware accelerated 3D rendering. The same graphic style was later used in many other games, especially genres where the player overviews the scene from the top. \emph{Dune II} released in 1992\cite{dune2} used direct top-down camera. To improve the visual appeal \emph{Warcraft: Orcs \& Humans} released two years later\cite{blizzardlegacy} tilted the camera slightly in one direction. Later games in the strategy genre\footnote{1990s classics including turn-based strategy \emph{Civilization II}\cite{civ2}, real-time strategy \emph{Age of Empires}\cite{ageofempires} and business simulator \emph{Transport Tycoon Deluxe}\cite{ttd}} fully adapted the isometric projection. These strategies often divided the map to regular tiles that limited the player actions but made collision detection and other game mechanics very simple. This design outlived the slow hardware with no graphic acceleration and is still popular both among independent developers with limited resources and in environments where hardware acceleration is not granted\footnote{Typically browser games discussed later.}. When 3D acceleration became affordable, focus of game development shifted to full 3D rendering. Although the player could be given full control of the camera, many games lock the camera in the same angle as is the isometric camera in order to avoid player confusion. Provided combination of realistic look of 3D rendered scene with perspective, shadows etc. and a clear overview of the scene defined by the isometric camera angle has proven to be optimal for wide array of games. Prime example be professionally played \emph{Starcraft 2}\cite{sc2} that does allow camera rotation, but the camera automatically returns to the original position afterwards.
 
-\begin{figure}[htp]
+\begin{figure}[h]
 	\centering
 	\includegraphics{zaxxon}
 	\caption{Isometric graphics in original arcade version of Zaxxon\cite{zaxxon}}
@@ -179,7 +179,7 @@ Google App Engine is a cloud hosting service provided by Google. The engine demo
 \label{implementation}
 Important factor of the engine implementation is reusability that requires abstraction of all details of any specific game. Anything that would lead to these specifics is delegated to objects providing the specific game implementation via calling their interfaces. Figure \ref{classdiagram} shows dependencies among the engine JavaScript modules as well as the dependency to the external implementation of a specific game.
 
-\begin{figure}[htp]
+\begin{figure}[h]
 	\centering
 	\includegraphics[width=\textwidth]{thesis-classdiagram}
 	\caption{Diagram of the JavaScript modules}
@@ -195,7 +195,7 @@ The client--engine interaction could have been implemented in a push manner, but
 
 Due to the isometric projection employed in the rendering, the range of tiles needed to populate the whole screen cannot be trivially defined. Figure \ref{isodata} shows the minimum amount of isometric tiles needed to cover a rectangular viewport. The dark grey tiles are not fully in the viewport, but still need to be rendered. To keep the data request simple and small, the white tiles are requested as well. Therefore the request may contains only of a top-left corner coordinates and then either width and height of the requested area or bottom-right coordinates. These options are mostly equivalent and for the engine implementation was chosen the latter one.
 
-\begin{figure}[htp]
+\begin{figure}[h]
 	\centering
 	\includegraphics[clip=true,trim=20mm 17mm 20mm 23mm]{thesis-isodata}
 	\caption{Data needed to fill a rectangular viewport}
@@ -205,20 +205,84 @@ Due to the isometric projection employed in the rendering, the range of tiles ne
 \subsection{Data caching}
 When the player moves around the map, server is requested for data on different locations. To make the player experience smoother, previously obtained data can be stored within the engine and if the player moves on the location of these data, potentially out-of-date tiles can be displayed meanwhile the new data is obtained. This way can be also utilized excessive data, discussed earlier, obtained with each response.
 
-Storing data on the client involves a couple intricacies. These are connected to the behaviour of the JavaScript array object and its low level implementation. The problematic part is that only non negative integer indexes are supported by the array. Everything else -- be it negative integers, floating point numbers or straight up strings -- falls back to the property indexer. That is not only much slower than the array indexer, but also requires specific iteration. The tile coordinates are integers, but from the centre $(0,0)$ spread to all four directions, making half of them negative. Fortunately this can be eliminated by a simple transformation of the coordinates prior to the storage.
+Storing data on the client involves a couple intricacies. These are connected to the behaviour of the JavaScript array object and its low level implementation. The problematic part is that only non negative integer indexes are supported by the array. Everything else -- be it negative integers, floating point numbers or straight up strings -- falls back to the property indexer. That is not only much slower than the array indexer, but also requires specific iteration. The tile coordinates are integers, but from the centre $(0,0)$ spread to all four directions, making half of them negative. Fortunately this can be eliminated by a simple transformation of the coordinates prior to the storage. Using the function declared in Figure \ref{indextransformation} the negative indexes are interspersed with the positive ones and the zero in the same manner a Turing machine with two way infinite tape can be simulated.
+
+\begin{figure}[h]
+\centering
+\begin{math}
+f(x) = 
+\left\{
+	\begin{array}{ll}
+		2x  & \mbox{if } x \geq 0\\
+		-2x - 1 & \mbox{if } x < 0
+	\end{array}
+\right.
+\end{math}
+\caption{Index transformation function}
+\label{indextransformation}
+\end{figure}
 
 Array in JavaScript is natively sparse, therefore missing items take up close to no memory\cite{javascriptarray}. However collecting all obtained data without a thought is out of questions since as a wise man said, ``a cache with a bad policy is another name for a memory leak''\cite{chen}. All obtained data can be cached as long as they are deleted at some point. The data cache implementation used in the engine uses to two-dimensional arrays to store tile data. Once is the first filled to a given limit, the second is filled instead and reading tries the current array first and if it fails, falls back to the older array. Once both arrays are filled to the given limit, older is deleted and serves as an empty current array. This mechanism is not very sophisticated, but does the job well enough.
 
 \subsection{Isometric transformation}
+All functionality linked to the isometric projection is encapsulated in the \emph{Camera} object implemented as a part of the engine. The transformation of orthogonal coordinates to the isometric ones defined in Figure \ref{isotransformation} needs to be modified to take into consideration also the fact that the data coordinates is in virtual tile units while the isometric coordinates used on screen need to be in pixels\cite{pagella}. Since the tile size in pixels is known, this can be achieved with a simple multiplication. Another necessary modification is to centre the whole transformed image to the screen by subtracting a half screen size offset.
+
+\begin{figure}
+	\centering
+	\begin{math}
+		\begin{array}{lcl}
+			isoX(x,y)&=&\frac{x - y}{2} \\\\
+			isoY(x,y)&=&\frac{x + y}{2}
+		\end{array}
+	\end{math}
+	\caption{Isometric coordinates transformation}
+	\label{isotransformation}
+\end{figure}
 
 \section{Object stacking and verticality}
+Just like when working with the full 3D projection, objects that are further away need to be hidden behind objects closer to the camera and objects that are on top need to hide objects beneath them. Figure \ref{objectordering} shows a correct objects overlap. Otherwise the perception of space would be completely ruined. When working with a \texttt{canvas} element this needs to be handled by properly ordering all objects to be rendered so the objects in the foreground are drawn last and cover anything drawn prior to them. When also considering the elevation of each element, this may become quite a complex operation. 
+
+Fortunately a DOM manipulation -- be it SVG or standard HTML -- allows different approach. Standard DOM element function \texttt{insertBefore} allows to add element to a specified place in the element collection\cite{insertbefore}. Since the elements are rendered in the order in what they appear in this collection of siblings, the last remaining problem is to find where in this collection should the new element be placed. As long as a position in the map is stored with each tile element and the underlying tile stored with each object placed on that tile, the place where new element will hide everything that is behind while being covered with everything that is actually in front of it can be found. The indicator used in the engine implementation is a sum of both coordinates for it correlates with the y coordinate of isometric projection as is apparent in Figure \ref{isotransformation}. It is also worth to notice that objects capable of position change need to be moved in the element collection during the movement. Otherwise an object that was correctly covering another object may end up still covering it even though it should not anymore. Figure \ref{movement} shows proper ordering change during a movement of sample objects, in this case train cars.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=\textwidth]{thesis-movement}
+	\caption{Object movement handled by the engine}
+	\label{movement}
+\end{figure}
+
+Objects elevated by either standing on something or flying in space need to handled extra in the isometric projection. Their altitude reflects in the final coordinates by a y-coordinate decrease. The engine calculates the amount of this decrease as a sum of heights all objects that are beneath given object on the same tile. Stacking objects on top of each other is shown on Figure \ref{stacking}.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=\textwidth]{thesis-stacking}
+	\caption{Object stacking handled by the engine}
+	\label{stacking}
+\end{figure}
 
 \section{Asset declaration}
+Whenever the engine needs to create something with visual representation, interface referred to as the asset handler is consulted. The asset handler functions are passed the SVG context in a parameter and are expected to create an SVG element according to the object type or content passed in other parameter. The result is added to appropriate place in the DOM and positioned to fit a location in the isometric projection.
+
+This would cover the necessary engine functionality, but one further one more thing is implemented to make end user's life easier. When creating the element to visualize some data, the visual representation needs to be obtained from somewhere. To manage these in a form of bitmap sprites, an object called \emph{SpriteSheet} is made available. During the initialization of the game, one or more images can be loaded to memory and these or their parts can be declared as static or animated sprites. Each sprite is given an identifier so it can be later easily retrieved and used during the object creation. The sprite declaration needs to know the position of the sprite in the potentially larger sprite-sheet and optionally also the number of animation frames and the speed of the animation, or to be more precise the delay after each animation frame. Figure \ref{spritesheet} shows a sample sprite-sheet with three sprites, first is a desert with has five animation frames, second is grass with only three animation frames and the last is static concrete with no animation. Usage of this sprite-sheet can be seen on the background of Figures \ref{stacking} and \ref{movement}. When the input image is an animated GIF, no animation needs to be declared with the sprites since it is performed by the browser, not by DOM manipulation caused by the engine.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=\textwidth]{thesis-spritesheet}
+	\caption{Sample sprite-sheet}
+	\label{spritesheet}
+\end{figure}
+
+The \emph{SpriteSheet} is just an optional tool that can be ignored if the end application does not use bitmap sprites. In that case the SVG context is fully sufficient for the developer to create anything they may need.
 
 \section{Update loop}
-The update loop of a game engine can be implemented basically in two ways in JavaScript. The straight forward way would be to set timer and in the callback handle the game update. This way is deprecated since the introduction of a \texttt{requestAnimationFrame} function\cite{raf}.
+Even though the user interaction can be handled by asynchronous calls, a game engine still needs an update loop to update the game state according to external powers, game rules and to handle animations. The update loop can be implemented basically in two ways in JavaScript. The straight forward way would be to set interval and in the callback handle the game update. However using native interval is deprecated since the introduction of a \texttt{requestAnimationFrame} function\cite{raf}, the latter and better way. The scheduled interval cannot be synchronized with the browser update frequency and usually leads to unnecessary updates, especially when the browser window is not visible\cite{animationtiming}. Using \texttt{requestAnimationFrame} the update callback obtains a time stamp of the moment when the update was executed and can be compared with the same information obtained by previous update to calculate refresh rate or evaluate the necessity of server polling or sprite animation frame change. Since the engine needs a continuous loop, every update method needs to queue another animation frame request\cite{raf}. All of this is encapsulated in the \emph{Engine} object and everything the game needs to do after it is initialized is to call the \texttt{run} method.
 
 \section{User interaction}
+Handling the user interaction is delegated to the \emph{Controller} object serving as one of the game implementation interfaces. Controller is responsible for user interface creation as well as handling mouse and keyboard events. The engine attaches controller's \texttt{onClick} function to each tile created to make this easier. Keyboard handling can be implemented in the controller and does not require any support from the engine.
+
+To obtain additional data, controller can entirely bypass the engine and call client directly. The result of detailed data request discussed in Chapter \ref{datadesign} is passed to the controller anyway since the graphics engine does not need these additional data for anything.
+
+To demonstrate the engine capabilities implements the demo application a couple of sample objects that the user can perform various actions with. The train car can be placed and moved. The building can be placed and then serve as a platform for more objects to be placed on. Both can be seen on Figure \ref{movement}. Even though so few restrictions given to the actions make little sense for a real game, actual game logic in the demo controller would be counterproductive only obscuring the engine usage.
 
 \chapter{Testing and measurement}
 \label{testing}
