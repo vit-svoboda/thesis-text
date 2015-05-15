@@ -151,6 +151,7 @@ Another popular project called \emph{D3.js} does not limit its scope to SVG and 
 There are of course other libraries, but since the game developer using the engine will have to work with given SVG manipulation library to some extent, commonly used library with good documentation may make his use of the engine much easier. All considered, the \emph{svg.js} project was selected to serve as a SVG markup markup manipulation API.
 
 \subsection{General utility JavaScript libraries}
+\label{jslibs}
 Other general purpose JavaScript libraries are used to keep the actual engine code clean and readable. Like the previously discussed libraries, these are open source as well and use non-restrictive licenses.
 
 To help manage the JavaScript application structure, a library allowing to define modules and dependencies between them called \emph{require.js} is used. During execution on the client it makes sure all files containing required modules are loaded prior to their usage. \cite{requirejs} This approach eliminates many flaws of JavaScript as a language, particularly declaration scope confusion, possible redeclaration of variables and dependency on functions or variables that may not be declared yet.
@@ -286,9 +287,26 @@ To demonstrate the engine capabilities implements the demo application a couple 
 
 \chapter{Testing and measurement}
 \label{testing}
+JavaScript testing has as all web development its specifics, mainly due to the strong dependency to client web browser. Even though many standards were defined in an attempt to unify the browser behaviour, the actual implementations adopt the standards slowly and often not completely. Therefore the testing usually involves as many of browsers as the application user base is expected to be using. One can be careful not to use anything unsupported by some of target browsers, but at the end of the day, running the application in all of them still may discover some compatibility issues.
 
-\section{Performance on desktop and mobile devices}
-Mobile devices were probably a long shot, even desktop browsers have vast differences in performance - in chrome everything runs nicely, Firefox is barely usable and Internet Explorer 11 is absolutely useless.
+\section{Automatic testing}
+Part of the build process of the project containing the engine implementation are automatic tests. The expected behaviour of most of the implemented functionality is verified by running these tests at the end of each compilation. The \emph{Karma} runner discussed in Chapter \ref{jslibs} used to do this can be configured to run the complete test suite in many supported browser environments, however usually only single environment is enough to discover discrepancies  created by an incautious refactoring.
+
+\section{Performance in various browsers}
+One of more likely reasons for the \texttt{svg} element to be inferior to the commonly used \texttt{canvas} element in regards to the game graphics could be insufficient performance when working with a scene rendered as a large amount of SVG elements. In extreme case this could make the \texttt{svg} element completely useless for more complex games. To test this concern, a performance evaluation of the final engine has been performed on various platforms available at the time.
+
+The test consisted of rendering a 1920x1080 pixel\footnote{Current HD industry standard} area covered with pseudo random distribution of static and animated tiles. Roughly a thousand of these tiles was needed to fill the area. After initialization of the scene one minute was given to stabilize the frame-rate. Then a thousand of objects\footnote{The building object visible in Figure \ref{stacking} was used for this experiment, but any other object could have been used without effect on the results.} was added one by one with one second delay after each addition. Average frame-rate during these second long fragments was recorded. This test was repeated for all currently relevant web browsers. Figure \ref{performance-basic} shows results across all the tested browsers.
+
+\begin{figure}[h]
+	\centering
+	\input{thesis-performance-basic.tex}
+	\caption{Performance test results across browsers}
+	\label{performance-basic}
+\end{figure}
+
+The striking similarity of top three lines can be explained by \emph{Chrome}, \emph{Opera} and \emph{Vivaldi} sharing the same layout engine -- \emph{Blink} that is a fork of \emph{WebKIT}. Substantial drop in the frame-rate can be noticed when the screen filled more than 300 objects. At that point was the screen already completely cluttered with objects. Firefox and its optimization for 64bit systems -- Waterfox -- both showed very unstable and borderline usable frame-rate. The Internet Explorer proved useless with this much elements on screen.
+
+Worth to notice is also the CPU usage during the tests. WebKIT based browsers spawning multiple processes used around 60 \% of available 3.3GHz 4core Intel i5 2500K. Firefox steadily occupied 30 \% of CPU while the abstemious Internet Explorer consumed only around a quarter of the CPU capacity. None of the browsers deviated by excessive RAM usage.
 
 \chapter{Conclusion}
 Evaluation of the results with emphasis on my contribution from the point of view of a wider context.
@@ -298,7 +316,7 @@ Future work, possible improvements - missing features, React.js to optimize the 
 \bibliography{sources}     % BibTeX database file  
 
 \appendix
-\chapter{Engine implementation}
+\chapter{Engine implementation source codes}
 Source codes of the engine implementation described in Chapter \ref{implementation} is available on GitHub: \href{https://github.com/vit-svoboda/svg-engine}{https://github.com/vit-svoboda/svg-engine}.
 
 \chapter{How to use my engine for your game}
