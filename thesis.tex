@@ -34,7 +34,7 @@
 \end{ThesisDeclaration}  
  
 \begin{ThesisThanks}  
-I would like to thank my advisor for patience and academic guidance. I would also like to thank Ing. Ondřej Žižka for technical guidance.
+I would like to thank my advisor for patience and academic guidance. I would also like to thank Ing. Ondřej Žižka for technical consultations.
 \end{ThesisThanks}  
  
 \begin{ThesisAbstract}  
@@ -287,15 +287,18 @@ To demonstrate the engine capabilities implements the demo application a couple 
 
 \chapter{Testing and measurement}
 \label{testing}
-JavaScript testing has as all web development its specifics, mainly due to the strong dependency to client web browser. Even though many standards were defined in an attempt to unify the browser behaviour, the actual implementations adopt the standards slowly and often not completely. Therefore the testing usually involves as many of browsers as the application user base is expected to be using. One can be careful not to use anything unsupported by some of target browsers, but at the end of the day, running the application in all of them still may discover some compatibility issues.
+Testing JavaScript has its specifics, mainly due to the strong dependency to client web browser. Even though many standards were defined in an attempt to unify the browser behaviour, the actual implementations adopt the standards slowly and often deviate in seemingly minor details. Therefore the testing usually involves as many browsers as is expected to be commonly used among the target user base. One can be careful not to use anything unsupported by some of target browsers, but at the end of the day, running the application in all of the browsers still may discover some compatibility issues. Automation of this process may save quite a lot of time. 
 
 \section{Automatic testing}
-Part of the build process of the project containing the engine implementation are automatic tests. The expected behaviour of most of the implemented functionality is verified by running these tests at the end of each compilation. The \emph{Karma} runner discussed in Chapter \ref{jslibs} used to do this can be configured to run the complete test suite in many supported browser environments, however usually only single environment is enough to discover discrepancies  created by an incautious refactoring.
+Part of the build process of the project containing the engine implementation are automatic tests. The expected behaviour of most of the implemented functionality is verified by running all of these tests by the end of each build to detect regression of bugs. The automatic tests can easily check API behaviour in extreme cases that may be very difficult to reach from the user interface. The \emph{Karma} runner discussed in Chapter \ref{jslibs} used to do the execution of tests defined in JavaScript can be configured to run the complete test suite in many supported browser environments, however usually only single environment is enough to discover discrepancies created by an incautious refactoring. 
 
 \section{Performance in various browsers}
 One of more likely reasons for the \texttt{svg} element to be inferior to the commonly used \texttt{canvas} element in regards to the game graphics could be insufficient performance when working with a scene rendered as a large amount of SVG elements. In extreme case this could make the \texttt{svg} element completely useless for more complex games. To test this concern, a performance evaluation of the final engine has been performed on various platforms available at the time.
 
-The test consisted of rendering a 1920x1080 pixel\footnote{Current HD industry standard} area covered with pseudo random distribution of static and animated tiles. Roughly a thousand of these tiles was needed to fill the area. After initialization of the scene one minute was given to stabilize the frame-rate. Then a thousand of objects\footnote{The building object visible in Figure \ref{stacking} was used for this experiment, but any other object could have been used without effect on the results.} was added one by one with one second delay after each addition. Average frame-rate during these second long fragments was recorded. This test was repeated for all currently relevant web browsers. Figure \ref{performance-basic} shows results across all the tested browsers.
+\subsection{Basic test scenario}
+The primary test scenario consisted of rendering an area of given size covered with pseudo random distribution of static and animated tiles. The area size used for majority of the cases was 1920 pixels by 1080 pixels, which is equal to the industry standard size of HD displays. Roughly a thousand tiles was needed to fill the area. Twice a second a server update was requested resulting in content update of fifty tiles. After initialization of the scene one minute was given to stabilize the frame-rate. Then a thousand objects\footnote{The building object visible in Figure \ref{stacking} was used for this scenario, but any other object could have been used.} was added one by one with one second delay after each addition. An average frame-rate over each of these second long intervals was recorded with the current number of added objects. All of this was scripted in a similar manner to the automatic tests. The scenario was designed this way to simulate the normal usage by a player of potential strategic game. One execution of the scenario takes roughly 20 minutes regardless on the used hardware due to the delays. The machines used to run the performance tests were running Microsoft Windows 7 and during the tests also served to run the web server hosting the tested application and providing data updates.
+
+Described scenario was run in various currently relevant web browsers, including very common Google Chrome, Mozilla Firefox, Microsoft Internet Explorer, lately not very frequent Opera. As a curiosity also Firefox compiled with optimizations for 64bit systems called Waterfox\cite{waterfox} and recently announced Vivaldi available as a technical preview\cite{vivaldi}. The ideal frame-rate is at 60 FPS or only slightly bellow, but games are usually still playable down to 20 FPS\footnote{Depending on game genre -- games that require quick reactions require higher frame-rate to be played.}. Figure \ref{performance-basic} shows results across all the tested browsers. The striking similarity of top three lines can be explained by Chrome, Opera and Vivaldi sharing the same layout engine -- \emph{Blink} that is a fork of \emph{WebKIT}\cite{webkit}. Substantial drop in frame-rate can be noticed when the screen has been filled with more than 300 objects. At that point was the screen already completely cluttered with objects. Both Firefox and Waterfox showed very unstable and borderline usable frame-rate. The Internet Explorer proved useless with this much elements on screen.
 
 \begin{figure}[h]
 	\centering
@@ -304,13 +307,42 @@ The test consisted of rendering a 1920x1080 pixel\footnote{Current HD industry s
 	\label{performance-basic}
 \end{figure}
 
-The striking similarity of top three lines can be explained by \emph{Chrome}, \emph{Opera} and \emph{Vivaldi} sharing the same layout engine -- \emph{Blink} that is a fork of \emph{WebKIT}. Substantial drop in the frame-rate can be noticed when the screen filled more than 300 objects. At that point was the screen already completely cluttered with objects. Firefox and its optimization for 64bit systems -- Waterfox -- both showed very unstable and borderline usable frame-rate. The Internet Explorer proved useless with this much elements on screen.
+Worth notice is also the browser hardware usage CPU usage during the tests, all run on a 64bit desktop PC with 4core Intel Core i5 2500K CPU at 3.3~GHz and 8~GB of RAM. None of the browsers deviated by excessive memory usage. However the WebKIT based browsers spawning multiple processes that used around 60~\% of the CPU while Firefox steadily occupied only 30~\% of CPU and the abstemious Internet Explorer consumed only around a quarter of the CPU time.
 
-Worth to notice is also the CPU usage during the tests. WebKIT based browsers spawning multiple processes used around 60 \% of available 3.3GHz 4core Intel i5 2500K. Firefox steadily occupied 30 \% of CPU while the abstemious Internet Explorer consumed only around a quarter of the CPU capacity. None of the browsers deviated by excessive RAM usage.
+\begin{figure}[h]
+	\centering
+	\input{thesis-performance-gif.tex}
+	\caption{Results of the second test featuring animated GIF sprites}
+	\label{performance-gif}
+\end{figure}
+
+\subsection{Performance impact of animated GIF sprites}
+Selected browsers were subjected to another test, using the same scenario but now using animated GIF sprites instead of handling the animation in the engine code. Since WebKIT based browsers proved to perform very similarly and there was no difference between Firefox and Waterfox either during the earlier tests, only Chrome, Firefox and Internet Explorer were subjected to the second test. Results are displayed in Figure \ref{performance-gif}. While the frame-rate drop after a certain amount of object has been added to the scene present with Chrome during the previous test was eliminated, earlier all over the place Firefox frame-rate fell just above the Internet Explorer level. These changes in the performance suggest that using standard sprites and letting the engine animate them in the JavaScript code would be in most cases a better option.
+
+\subsection{Other performance influences}
+To compare how the engine performance scales with other properties of the environment, two more tests were performed. The first tried the so far best performing browser on a PC with considerably older hardware. The second testing machine was a laptop with 4 GB of RAM and Intel Pentium Dual-Core T3400 at 2.16 GHz, however as the name suggests, with only 2 cores. Figure \ref{performance-hw} compares results of the previous machine and the slower laptop. Using the older hardware, Chrome manage to keep frame-rate only barely usable.
+
+\begin{figure}[h]
+	\centering
+	\input{thesis-performance-cpus.tex}
+	\caption{Hardware influence on the engine performance in Chrome 42.0}
+	\label{performance-hw}
+\end{figure}
+
+Since the area used in all previous tests was quite large, even larger than the display of display used in previous tests, a smaller area was used in attempt to achieve better frame-rate by the overall slowest browser, Internet Explorer. Same scenario was used only with the area resolution halved in both directions, effectively making circa 250 tiles fill the screen instead of original thousand. Since the amount of objects added was kept the same, at the end of the scenario, the area was four times more cluttered by objects. As Figure \ref{performance-size} shows, for a managed Internet Explorer twice higher frame-rate until it got overwhelmed by the amount of objects added. At the end there was no difference caused by the smaller size of the rendered area.
+
+\begin{figure}[h]
+	\centering
+	\input{thesis-performance-size.tex}
+	\caption{Rendered area size influence on the engine performance in Internet Explorer 11.0}
+	\label{performance-size}
+\end{figure}
+
+\subsection{Summary}
+Over all was the engine performance rather poor, with the exception of WebKIT based browsers. On the other hand, WebKIT browsers are most common among the users these days\cite{browserstats}. To create a game enjoyable in all currently available browsers, only a limited amount of tiles can be displayed on the screen at all times. Slight improvement may be achieved by further optimization of the engine code, but according to the profiler, most of the execution time is taken up by element bounding box calculation by \texttt{getBBox} function implemented in the browsers\cite{svgtypes}. Other large factor in the engine performance is the browser performing reflow of the layout after most of DOM modifications. In this case might help to rewrite the engine using \emph{React.js}, a recent library that internally creates virtual copy of DOM and then calculates the minimum amount of real DOM changes to save time on reflow\cite{sobo}.
 
 \chapter{Conclusion}
 Evaluation of the results with emphasis on my contribution from the point of view of a wider context.
-Future work, possible improvements - missing features, React.js to optimize the DOM manipulation.
 
 \bibliographystyle{csplainnat} % sets plain bibliography style  
 \bibliography{sources}     % BibTeX database file  
