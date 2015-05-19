@@ -42,7 +42,7 @@ I would like to thank my advisor for patience and academic guidance. I would als
 \end{ThesisAbstract}  
  
 \begin{ThesisKeyWords}  
-5-10 key words, one key word can be multiple words. Key words are comma separated. Not the list of used technologies!
+2D graphics, game engine, HTML5, isometric projection, JavaScript, sprites, SVG
 \end{ThesisKeyWords}  
  
 \MainMatter
@@ -109,7 +109,7 @@ The \texttt{svg} element is very different as it displays given SVG\footnote{Sca
 
 Even though browsers used to support static SVG for a long time, not until HTML5 did they support dynamic in-line SVG\cite{w3_html5}. This is now available with the previously mentioned element, however since rendering the markup language is much more complicated than simple dumping the canvas bitmap on the screen, the browser support is delayed and also more sensitive to performance problems. Drawing to the canvas may take a lot of JavaScript execution time, but in the end the display of the element takes amount of time only proportional to the size of the canvas, not complexity of its content. Creating a large SVG will take similar time to drawing to the canvas, but then rendering it on the screen will take the browser more time dependant on the number of elements rendered.
 
-\chapter{Suggested solution / design}
+\chapter{Suggested solution and its design}
 \label{solution}
 As was discussed earlier, \texttt{canvas} based engines for browser games are quite common. Why is that there are no game engines based on \texttt{svg}? W3Schools in a chapter about HTML5 \texttt{svg} element warn that it, unlike the \texttt{canvas} element, is not suitable for game applications\cite{html5svg}. However is it possible to use an inline SVG to draw game graphics instead of the standard canvas approach? As proven by a demo build using Raphaël\footnote{An SVG manipulation library discussed later.}, at least a small game with simple graphics actually can be done\cite{raphaelfpsdemo}. With the event handling support, SVG should be even more suitable for interactive applications and additionally the possible manipulation only with specific objects in a drawn scene should make the subsequent scene updates much easier.
 
@@ -134,7 +134,7 @@ Unlike \texttt{canvas}, the SVG also allows to use animated GIF\footnote{Graphic
 \label{tech}
 An implementation of described engine would integrate multiple libraries and software components as well as technologies implemented by the browsers as part of various standards to achieve the best results without attempting to reinvent the wheel. All of the technologies are selected to address a specific need. The following enumeration outlines the rational behind selecting those worth mentioning.
 
-\section{Engine}
+\section{Engine itself}
 The graphics engine will be run on the client and therefore all technologies used in it are based around JavaScript. Either as a JavaScript API provided by the browsers themselves or various JavaScript libraries offering functionality useful in some aspect of the engine implementation.
 
 \subsection{Browser support of HTML5 SVG element}
@@ -360,19 +360,20 @@ Even though the engine implementation attempt was successful and the result meet
 \bibliography{sources}     % BibTeX database file  
 
 \appendix
-\chapter{Engine implementation source codes}
-Source codes of the engine implementation described in Chapter \ref{implementation} is available on GitHub: \href{https://github.com/vit-svoboda/svg-engine}{https://github.com/vit-svoboda/svg-engine}.
+\chapter{Supplement contents}
 
-\chapter{How to use my engine for your game}
-The engine provides API makes the viewport manipulation very easy. The use of this API is demonstrated in the \href{https://github.com/vit-svoboda/svg-engine/tree/master/src/main/webapp/Scripts/game}{sample application}.
+Source code of the proposed engine implementation described in Chapter \ref{implementation} as well as the demo application showing the usage of the engine are available in a Git repository hosted on \emph{GitHub}: \href{https://github.com/vit-svoboda/svg-engine}{https://github.com/vit-svoboda/svg-engine}. A copy of the source code is also available in the thesis supplements. Key part of the provided code are the web application scripts.
+
+\chapter{Engine user's guide}
+The engine provides API that makes the viewport content manipulation very easy. The use of this API is demonstrated in the \href{https://github.com/vit-svoboda/svg-engine/tree/master/src/main/webapp/Scripts/game}{sample application}. Part of the engine configuration are three interfaces that together provide the game specifics implementation. All of them can be implemented by a single object or each can be an object on its own. However all of the interface implementations need to be handed over to the engine during its initialization. When everything is set up, calling method \texttt{Engine.run} will launch the game update loop. 
 
 \section{Data feed}
-Data describing what should be displayed are provided to the engine through an object passed as a first parameter of engine.init method. When engine needs data, methods getData or getDetailedData are called. This data can be obtained from a remote server using HTTP requests, stored in the client memory and passed directly or in any other way suitable for the given game.
+Data describing what should be displayed on the screen are provided to the engine through an object passed as a first parameter of \texttt{Engine.init} method. When engine needs data, methods \texttt{getData} or \texttt{getDetailedData} are called. This data can be obtained from a remote server using HTTP requests, stored in the client memory and passed directly or in any other way suitable for the given game.
 
 \section{Asset management}
-To give the game implementation power over what is displayed in place of data discussed earlier, everything displayed is translated using an object passed as a second parameter of the engine.init method. This translation is performed via methods createTile or createObject where the SVG drawing context is provided. Result is placed on the corresponding place in the viewport.
+To give the game implementation power over what is displayed in place of data discussed earlier, everything displayed is translated using an object passed as a second parameter of the \texttt{Engine.init} method. This translation is performed via methods \texttt{createTile} or \texttt{createObject} where the SVG drawing context is provided to allow proper element creation. The result is placed on the corresponding place in the viewport.
 
 \section{UI handling and game logic}
-The third object passed to the engine.init method is responsible for handling user interaction. method createUi is responsible for the standard UI displayed all the time, method processDetailedData is a handler for detailed tile data once it is obtained and method onClick is a handler for any tile or object clicked. Here most of the user interaction needs to be handled. Very little boundaries are given to other interaction implementation though.
+The third object passed to the \texttt{Engine.init} method is responsible for handling user interaction. Method \texttt{createUi} is responsible for the standard UI displayed all the time, method \texttt{processDetailedData} is a handler for detailed tile data once it is obtained and method \texttt{onClick} is a handler for any tile or object clicked. Here most of the user interaction needs to be handled. Very little boundaries are given to other interaction implementation though.
 
 \end{document} 
